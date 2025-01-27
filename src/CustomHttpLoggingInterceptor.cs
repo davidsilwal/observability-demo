@@ -10,7 +10,7 @@ public class CustomHttpLoggingInterceptor : IHttpLoggingInterceptor
         //}
 
 
-        logContext.AddParameter("CustomField", "CustomValue");
+        logContext.AddParameter("RemoteIpAddress", logContext.HttpContext.Connection?.RemoteIpAddress?.ToString());
 
         return ValueTask.CompletedTask;
     }

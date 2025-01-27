@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -21,10 +20,10 @@ builder.Services.AddHttpLogging(opts =>
 {
     opts.CombineLogs = true;
     opts.LoggingFields =
-    HttpLoggingFields.RequestPropertiesAndHeaders |
-    HttpLoggingFields.ResponsePropertiesAndHeaders;
-
+        HttpLoggingFields.RequestPropertiesAndHeaders |
+        HttpLoggingFields.ResponsePropertiesAndHeaders;
 });
+
 
 builder.Services.AddHttpLoggingInterceptor<CustomHttpLoggingInterceptor>();
 
@@ -35,8 +34,8 @@ builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
     {
         metrics.AddAspNetCoreInstrumentation()
-               .AddHttpClientInstrumentation()
-               .AddRuntimeInstrumentation();
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation();
     })
     .WithTracing(tracing =>
     {
@@ -46,8 +45,8 @@ builder.Services.AddOpenTelemetry()
         }
 
         tracing
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation();
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation();
     });
 
 
@@ -59,7 +58,6 @@ if (useOtlpExporter)
 }
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -77,20 +75,25 @@ var summaries = new[]
 };
 
 app.MapGet("/weatherforecast", (ILogger<Program> logger) =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
+    {
+        using var _ = logger.BeginScope(new List<KeyValuePair<string, object>>
+        {
+            new("DateTime", DateTime.Now.ToString())
+        });
 
-    logger.GeneratedWeatherForecasts(forecast);
+        var forecast = Enumerable.Range(1, 5).Select(index =>
+                new WeatherForecast
+                (
+                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                    Random.Shared.Next(-20, 55),
+                    summaries[Random.Shared.Next(summaries.Length)]
+                ))
+            .ToArray();
 
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+        logger.GeneratedWeatherForecasts(forecast);
+
+        return forecast;
+    })
+    .WithName("GetWeatherForecast");
 
 app.Run();
