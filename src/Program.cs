@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -14,6 +16,17 @@ builder.Logging.AddOpenTelemetry(logging =>
     logging.IncludeFormattedMessage = true;
     logging.IncludeScopes = true;
 });
+
+builder.Services.AddHttpLogging(opts =>
+{
+    opts.CombineLogs = true;
+    opts.LoggingFields =
+    HttpLoggingFields.RequestPropertiesAndHeaders |
+    HttpLoggingFields.ResponsePropertiesAndHeaders;
+
+});
+
+builder.Services.AddHttpLoggingInterceptor<CustomHttpLoggingInterceptor>();
 
 var appName = builder.Environment.ApplicationName;
 
@@ -47,6 +60,7 @@ if (useOtlpExporter)
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -55,12 +69,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseHttpLogging();
+
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/weatherforecast", (ILogger<Program> logger) =>
 {
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
@@ -70,13 +86,11 @@ app.MapGet("/weatherforecast", () =>
             summaries[Random.Shared.Next(summaries.Length)]
         ))
         .ToArray();
+
+    logger.GeneratedWeatherForecasts(forecast);
+
     return forecast;
 })
 .WithName("GetWeatherForecast");
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
