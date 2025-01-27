@@ -6,27 +6,29 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ./tmp/loki:/loki/
+      - loki_data:/loki/
       - ./.config/loki.yaml:/etc/loki/local-config.yaml:ro
     command: -config.file=/etc/loki/local-config.yaml
 
   tempo:
     image: grafana/tempo:latest
     container_name: tempo
+    user: "0:0"  # Run as root to avoid permission issues
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
       - ./.config/tempo.yaml:/etc/tempo.yaml
-      - ./tmp/tempo:/tmp/tempo
+      - tempo_data:/tmp/tempo
 
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - grafana_data:/var/lib/grafana/
+      - ./.config/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./.config/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/main.yaml
+      - ./.config/grafana/datasources:/etc/grafana/provisioning/datasources 
     environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_DISABLE_LOGIN_FORM=true
-      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     ports:
       - "3000:3000"
   
@@ -47,3 +49,7 @@ services:
       - ./.config/mimir.yaml:/etc/mimir/mimir.yaml
     command:
       - --config.file=/etc/mimir/mimir.yaml
+volumes:
+    grafana_data:
+    loki_data:
+    tempo_data:

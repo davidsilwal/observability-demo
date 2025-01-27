@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservabilityDemo", "ObservabilityDemo.csproj", "{E8003388-6CDE-4030-9A4E-9EFDC2320870}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservabilityDemo", "src\ObservabilityDemo.csproj", "{6E263E23-A7AA-4558-96E4-44CC7EF6AD45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,10 +10,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E8003388-6CDE-4030-9A4E-9EFDC2320870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8003388-6CDE-4030-9A4E-9EFDC2320870}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8003388-6CDE-4030-9A4E-9EFDC2320870}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8003388-6CDE-4030-9A4E-9EFDC2320870}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E263E23-A7AA-4558-96E4-44CC7EF6AD45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E263E23-A7AA-4558-96E4-44CC7EF6AD45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E263E23-A7AA-4558-96E4-44CC7EF6AD45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E263E23-A7AA-4558-96E4-44CC7EF6AD45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
