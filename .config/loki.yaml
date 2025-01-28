@@ -36,13 +36,12 @@ schema_config:
 
 storage_config:
   aws:
-    s3: s3://CglZaOvJutYBwRJ72GJc:AAIqGaTs6Ro0TsLFJVCJN2fRhWK0m2UQ6lTFXuVI@minio:9000/loki-chunks
-      # bucketnames: loki-chunks
-      # endpoint: minio:9000
-      # access_key_id: "CglZaOvJutYBwRJ72GJc"
-      # secret_access_key: "AAIqGaTs6Ro0TsLFJVCJN2fRhWK0m2UQ6lTFXuVI"
-      # s3forcepathstyle: true
-      # insecure: true
+      bucketnames: loki-chunks
+      endpoint: minio:9000
+      access_key_id: "CglZaOvJutYBwRJ72GJc"
+      secret_access_key: "AAIqGaTs6Ro0TsLFJVCJN2fRhWK0m2UQ6lTFXuVI"
+      s3forcepathstyle: true
+      insecure: true
 
   boltdb_shipper:
     active_index_directory: /loki/index
