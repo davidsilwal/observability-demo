@@ -47,6 +47,22 @@ services:
       - ./.config/mimir.yaml:/etc/mimir/mimir.yaml
     command:
       - --config.file=/etc/mimir/mimir.yaml
+        
+  jaeger:
+    image: jaegertracing/jaeger:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"     
+  
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    environment:
+      - ACCEPT_EULA=Y
+    restart: always
+    ports:
+      - "8080:80"
+
 volumes:
     grafana_data:
     loki_data:
