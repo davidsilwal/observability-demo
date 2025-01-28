@@ -8,6 +8,8 @@ limits_config:
 
 server:
   http_listen_port: 3100
+  ring:
+   zone_awareness_enabled: false
 
 common:
   path_prefix: /tmp/loki
