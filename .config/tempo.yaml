@@ -10,11 +10,17 @@ distributor:
         http:  # OTLP HTTP receiver
           endpoint: "0.0.0.0:4318"
 
+
+compactor:
+    compaction:
+      block_retention: 720h #30 days retention
+
 storage:
   trace:
-    backend: local                     # backend configuration to use
-    local:
-      path: /tmp/tempo/blocks
-    pool:
-      max_workers: 100                 # worker pool determines the number of parallel requests to the object store backend
-      queue_depth: 10000
+    backend: s3
+    s3:
+      endpoint: "minio:9000"
+      bucket: grafana-tempo
+      access_key: CglZaOvJutYBwRJ72GJc
+      secret_key: AAIqGaTs6Ro0TsLFJVCJN2fRhWK0m2UQ6lTFXuVI
+      insecure: true

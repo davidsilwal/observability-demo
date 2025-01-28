@@ -47,7 +47,22 @@ services:
       - ./.config/mimir.yaml:/etc/mimir/mimir.yaml
     command:
       - --config.file=/etc/mimir/mimir.yaml
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001" # MinIO console
+    environment:
+      MINIO_ROOT_USER: myrootuser
+      MINIO_ROOT_PASSWORD: myrootpassword
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
 volumes:
     grafana_data:
     loki_data:
     tempo_data:
+    minio_data:

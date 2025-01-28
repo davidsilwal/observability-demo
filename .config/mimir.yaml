@@ -2,43 +2,31 @@
 # Simple Mimir configuration taken from https://grafana.com/docs/mimir/latest/get-started/
 multitenancy_enabled: false
 
+common:
+  storage:
+    backend: s3
+    s3:
+      endpoint: minio:9000
+      insecure: true
+      access_key_id: "CglZaOvJutYBwRJ72GJc"
+      secret_access_key: "AAIqGaTs6Ro0TsLFJVCJN2fRhWK0m2UQ6lTFXuVI" 
+
 blocks_storage:
-  backend: filesystem
-  bucket_store:
-    sync_dir: /tmp/mimir/tsdb-sync
-  filesystem:
-    dir: /tmp/mimir/data/tsdb
-  tsdb:
-    dir: /tmp/mimir/tsdb
+  s3:
+    bucket_name: mimir-blocks
 
-# compactor:
-#   data_dir: /tmp/mimir/compactor
-#   sharding_ring:
-#     kvstore:
-#       store: memberlist
+alertmanager_storage:
+  s3:
+    bucket_name: mimir-alertmanager
 
-distributor:
-  ring:
-    instance_addr: 127.0.0.1
-    kvstore:
-      store: memberlist
+ruler_storage:
+  s3:
+    bucket_name: mimir-ruler
 
-ingester:
-  ring:
-    instance_addr: 127.0.0.1
-    kvstore:
-      store: memberlist
-    replication_factor: 1
-
-# ruler_storage:
-#   backend: filesystem
-#   filesystem:
-#     dir: /tmp/mimir/rules
+limits:
+  # Delete from storage metrics data older than 30 days.
+  compactor_blocks_retention_period: 720h #30 days retention
 
 server:
   http_listen_port: 9009
   log_level: error
-
-# store_gateway:
-#   sharding_ring:
-#     replication_factor: 1
