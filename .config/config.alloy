@@ -1,0 +1,42 @@
+otelcol.receiver.otlp "default" {
+	grpc { }
+
+	output {
+		metrics = [otelcol.processor.batch.default.input]
+		logs    = [otelcol.processor.batch.default.input]
+		traces  = [otelcol.processor.batch.default.input]
+	}
+}
+
+otelcol.processor.batch "default" {
+	output {
+		metrics = [otelcol.exporter.otlphttp.default_mimir.input]
+		logs    = [otelcol.exporter.otlphttp.default_logs.input]
+		traces  = [otelcol.exporter.otlphttp.default_tempo.input]
+	}
+}
+
+otelcol.exporter.otlphttp "default_mimir" {
+	client {
+		endpoint           = "http://mimir:9009/otlp"
+		http2_ping_timeout = "0s"
+	}
+}
+
+otelcol.exporter.otlphttp "default_logs" {
+	client {
+		endpoint           = "http://loki:3100/otlp"
+		http2_ping_timeout = "0s"
+	}
+}
+
+otelcol.exporter.otlphttp "default_tempo" {
+	client {
+		endpoint = "http://tempo:4318"
+
+		tls {
+			insecure = true
+		}
+		http2_ping_timeout = "0s"
+	}
+}
