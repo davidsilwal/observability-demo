@@ -2,6 +2,8 @@
 # Simple Mimir configuration taken from https://grafana.com/docs/mimir/latest/get-started/
 multitenancy_enabled: false
 
+target: all,alertmanager,overrides-exporter
+
 common:
   storage:
     backend: s3
@@ -14,6 +16,9 @@ common:
 blocks_storage:
   s3:
     bucket_name: mimir-blocks
+  storage_prefix: blocks
+  tsdb:
+    dir: /data/ingester
 
 alertmanager_storage:
   s3:
@@ -26,6 +31,14 @@ ruler_storage:
 limits:
   # Delete from storage metrics data older than 30 days.
   compactor_blocks_retention_period: 720h #30 days retention
+
+# Use memberlist, a gossip-based protocol, to enable the 3 Mimir replicas to communicate
+memberlist:
+  join_members: [mimir]
+
+ingester:
+  ring:
+    replication_factor: 1
 
 server:
   http_listen_port: 9009

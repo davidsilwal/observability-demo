@@ -9,6 +9,8 @@ services:
       - loki_data:/loki/
       - ./.config/loki.yaml:/etc/loki/local-config.yaml:ro
     command: -config.file=/etc/loki/local-config.yaml
+    depends_on:
+      - minio
 
   tempo:
     image: grafana/tempo:latest
@@ -18,6 +20,8 @@ services:
     volumes:
       - ./.config/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/tmp/tempo
+    depends_on:
+      - minio
 
   grafana:
     image: grafana/grafana:latest
@@ -29,6 +33,9 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     ports:
       - "3000:3000"
+    depends_on:
+      - loki
+      - tempo
   
   otel-collector:
     image: otel/opentelemetry-collector:latest
@@ -37,6 +44,10 @@ services:
       - ./.config/otel.yaml:/etc/otel.yaml
     ports:
       - "4317:4317" # OTLP gRPC receiver
+    depends_on:
+      - tempo
+      - loki
+      - mimir
 
   mimir:
     image: grafana/mimir:latest
@@ -47,6 +58,8 @@ services:
       - ./.config/mimir.yaml:/etc/mimir/mimir.yaml
     command:
       - --config.file=/etc/mimir/mimir.yaml
+    depends_on:
+      - minio
 
   minio:
     image: minio/minio:latest

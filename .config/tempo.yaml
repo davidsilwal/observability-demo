@@ -10,7 +10,6 @@ distributor:
         http:  # OTLP HTTP receiver
           endpoint: "0.0.0.0:4318"
 
-
 compactor:
     compaction:
       block_retention: 720h #30 days retention
