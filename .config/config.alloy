@@ -8,6 +8,22 @@ otelcol.receiver.otlp "default" {
 	}
 }
 
+prometheus.scrape "example" {
+  targets = [
+	{ __address__ = "node-exporter:9100", "instance" = "node" },
+	{ __address__ = "blackbox-exporter:9115", "instance" = "blackbox" },
+	]
+
+  forward_to = [prometheus.remote_write.default.receiver]
+}
+
+
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://mimir:9009/api/v1/push"
+  }
+}
+
 otelcol.processor.batch "default" {
 	output {
 		metrics = [otelcol.exporter.otlphttp.default_mimir.input]

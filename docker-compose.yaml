@@ -24,9 +24,11 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana/
       - ./.config/grafana/datasources:/etc/grafana/provisioning/datasources 
+      - ./.config/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./.config/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/main.yaml
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+       - GF_AUTH_ANONYMOUS_ENABLED=true
+       - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
     ports:
       - "3000:3000"
   
@@ -52,6 +54,34 @@ services:
       - ./.config/mimir.yaml:/etc/mimir/mimir.yaml
     command:
       - --config.file=/etc/mimir/mimir.yaml
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: always
+    network_mode: "host" # Use host network to access system metrics
+    ports:
+      - "9100:9100" # Node Exporter listens on this port by default
+    volumes:
+      - ./tmp/proc:/host/proc:ro
+      - ./tmp/sys:/host/sys:ro
+      - ./tmp/:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: blackbox-exporter
+    restart: always
+    ports:
+      - "9115:9115" # Blackbox Exporter listens on this port by default
+    volumes:
+      - ./.config/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    command:
+      - "--config.file=/etc/blackbox_exporter/config.yml"
+
 volumes:
     grafana_data:
     loki_data:
