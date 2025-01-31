@@ -1,35 +1,18 @@
 version: '3'
 services:
-   
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    volumes:
-      - loki_data:/loki/
-      - ./.config/loki.yaml:/etc/loki/local-config.yaml:ro
-    command: -config.file=/etc/loki/local-config.yaml
-
-  tempo:
-    image: grafana/tempo:latest
-    container_name: tempo
-    user: "0:0"  # Run as root to avoid permission issues
-    command: [ "-config.file=/etc/tempo.yaml" ]
-    volumes:
-      - ./.config/tempo.yaml:/etc/tempo.yaml
-      - tempo_data:/tmp/tempo
-
-  grafana:
-    image: grafana/grafana:latest
-    volumes:
-      - grafana_data:/var/lib/grafana/
-      - ./.config/grafana/datasources:/etc/grafana/provisioning/datasources 
+  openobserve:
+    image: public.ecr.aws/zinclabs/openobserve:latest
+    container_name: openobserve
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - ZO_ROOT_USER_EMAIL=admin@example.com       # Admin email
+      - ZO_ROOT_USER_PASSWORD=Admin@123     # Admin password
+      - ZO_DATA_DIR=/data                         # Data directory inside the container
     ports:
-      - "3000:3000"
-  
+      - "5080:5080"                               # HTTP port for OpenObserve web UI/API
+    volumes:
+      - openobserve_data:/data                              # Bind mount for persistent data storage
+    restart: always
+ 
   otel-collector:
     image: otel/opentelemetry-collector:latest
     command: [ "--config=/etc/otel.yaml" ]
@@ -37,17 +20,5 @@ services:
       - ./.config/otel.yaml:/etc/otel.yaml
     ports:
       - "4317:4317" # OTLP gRPC receiver
-
-  mimir:
-    image: grafana/mimir:latest
-    container_name: mimir
-    ports:
-      - "9009:9009" # Query API
-    volumes:
-      - ./.config/mimir.yaml:/etc/mimir/mimir.yaml
-    command:
-      - --config.file=/etc/mimir/mimir.yaml
 volumes:
-    grafana_data:
-    loki_data:
-    tempo_data:
+  openobserve_data:

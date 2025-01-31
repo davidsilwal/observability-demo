@@ -13,16 +13,14 @@ exporters:
   debug:
     verbosity: detailed
 
-  otlphttp/logs:
-    endpoint: "http://loki:3100/otlp"
-  
-  otlphttp/tempo: 
-    endpoint: "http://tempo:4318"
-    tls:
-      insecure: true
-
-  otlphttp/mimir:
-    endpoint: http://mimir:9009/otlp
+  otlp/openobserve:
+      endpoint: openobserve:5081
+      headers:
+        Authorization: "Basic YWRtaW5AZXhhbXBsZS5jb206UWN5MU1iRmlrbUV6MUlpYg=="
+        organization: default
+        stream-name: default
+      tls:
+        insecure: true
 
 # Pipelines
 service:
@@ -30,12 +28,12 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlphttp/logs]
+      exporters: [otlp/openobserve]
     traces: 
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlphttp/tempo] 
+      exporters: [otlp/openobserve] 
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlphttp/mimir]
+      exporters: [otlp/openobserve]
