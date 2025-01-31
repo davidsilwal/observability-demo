@@ -55,32 +55,32 @@ services:
     command:
       - --config.file=/etc/mimir/mimir.yaml
 
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
-    restart: always
-    network_mode: "host" # Use host network to access system metrics
-    ports:
-      - "9100:9100" # Node Exporter listens on this port by default
-    volumes:
-      - ./tmp/proc:/host/proc:ro
-      - ./tmp/sys:/host/sys:ro
-      - ./tmp/:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--path.rootfs=/rootfs'
+  # node-exporter:
+  #   image: prom/node-exporter:latest
+  #   container_name: node-exporter
+  #   restart: always
+  #   network_mode: "host" # Use host network to access system metrics
+  #   ports:
+  #     - "9100:9100" # Node Exporter listens on this port by default
+  #   volumes:
+  #     - ./tmp/proc:/host/proc:ro
+  #     - ./tmp/sys:/host/sys:ro
+  #     - ./tmp/:/rootfs:ro
+  #   command:
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.sysfs=/host/sys'
+  #     - '--path.rootfs=/rootfs'
 
-  blackbox-exporter:
-    image: prom/blackbox-exporter:latest
-    container_name: blackbox-exporter
-    restart: always
-    ports:
-      - "9115:9115" # Blackbox Exporter listens on this port by default
-    volumes:
-      - ./.config/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
-    command:
-      - "--config.file=/etc/blackbox_exporter/config.yml"
+  # blackbox-exporter:
+  #   image: prom/blackbox-exporter:latest
+  #   container_name: blackbox-exporter
+  #   restart: always
+  #   ports:
+  #     - "9115:9115" # Blackbox Exporter listens on this port by default
+  #   volumes:
+  #     - ./.config/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+  #   command:
+  #     - "--config.file=/etc/blackbox_exporter/config.yml"
 
 volumes:
     grafana_data:

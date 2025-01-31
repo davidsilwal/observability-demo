@@ -33,6 +33,15 @@ builder.Services.AddOpenTelemetry()
     .ConfigureResource(resourceBuilder => resourceBuilder.AddService(appName))
     .WithMetrics(metrics =>
     {
+        metrics.AddMeter("Microsoft.AspNetCore.Hosting",
+        "Microsoft.AspNetCore.Server.Kestrel");
+        metrics.AddView("http.server.request.duration",
+            new ExplicitBucketHistogramConfiguration
+            {
+                Boundaries = new double[] { 0, 0.005, 0.01, 0.025, 0.05,
+                    0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10 }
+            });
+
         metrics.AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddRuntimeInstrumentation();
