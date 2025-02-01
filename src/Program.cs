@@ -32,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseWatchDogExceptionLogger();
+
 app.UseWatchDog(opt =>
 {
     opt.WatchPageUsername = "admin";
