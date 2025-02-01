@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.HttpLogging;
-using OpenTelemetry;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using WatchDog;
+using WatchDog.src.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,11 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Logging.AddOpenTelemetry(logging =>
+builder.Services.AddWatchDogServices(opt =>
 {
-    logging.IncludeFormattedMessage = true;
-    logging.IncludeScopes = true;
+    opt.IsAutoClear = true;
+    opt.ClearTimeSchedule = WatchDogAutoClearScheduleEnum.Monthly;
 });
+
+builder.Logging.AddWatchDogLogger();
 
 builder.Services.AddHttpLogging(opts =>
 {
@@ -24,39 +24,6 @@ builder.Services.AddHttpLogging(opts =>
         HttpLoggingFields.ResponsePropertiesAndHeaders;
 });
 
-
-builder.Services.AddHttpLoggingInterceptor<CustomHttpLoggingInterceptor>();
-
-var appName = builder.Environment.ApplicationName;
-
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resourceBuilder => resourceBuilder.AddService(appName))
-    .WithMetrics(metrics =>
-    {
-        metrics.AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddRuntimeInstrumentation();
-    })
-    .WithTracing(tracing =>
-    {
-        if (!builder.Environment.IsProduction())
-        {
-            tracing.SetSampler(new AlwaysOnSampler());
-        }
-
-        tracing
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation();
-    });
-
-
-var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
-
-if (useOtlpExporter)
-{
-    builder.Services.AddOpenTelemetry().UseOtlpExporter();
-}
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -64,6 +31,12 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseWatchDog(opt =>
+{
+    opt.WatchPageUsername = "admin";
+    opt.WatchPagePassword = "admin";
+});
 
 app.UseHttpsRedirection();
 
