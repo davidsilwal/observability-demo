@@ -14,10 +14,10 @@ exporters:
     verbosity: 
  
   elasticsearch:
-    endpoint: http://opensearch:9200
-    tls:
-        insecure: true    
+    endpoints: [http://elasticsearch:9200]
 
+  # otlp:
+  #       endpoint: "elasticsearch:8200"
 # Pipelines
 service:
   pipelines:
@@ -25,11 +25,11 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [elasticsearch]
-    # traces: 
-    #   receivers: [otlp]
-    #   processors: [batch]
-    #   exporters: [elasticsearch] 
-    # metrics:
-    #   receivers: [otlp]
-    #   processors: [batch]
-    #   exporters: [elasticsearch]
+    traces: 
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [elasticsearch] 
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [elasticsearch]

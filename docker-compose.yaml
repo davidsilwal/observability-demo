@@ -1,30 +1,32 @@
 version: '3'
-services:
-  opensearch:
-    image: opensearchproject/opensearch:latest
-    container_name: opensearch
-    environment:
-      discovery.type: single-node
-      node.name: opensearch
-      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
-      OPENSEARCH_INITIAL_ADMIN_PASSWORD: S9\V1ZeBc0(S
-    volumes:
-      - opensearch_data:/usr/share/opensearch/data
-    ports:
-      - 9200:9200
-      - 9600:9600
 
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
-    ports:
-      - 5601:5601
-    expose:
-      - "5601"
+services:
+  elasticsearch:
+    image: elasticsearch:8.17.1
+    container_name: elasticsearch
     environment:
-      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+      - discovery.type=single-node
+      # - xpack.security.enabled=false # Disable security for simplicity
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=123456
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m # Set Java heap size
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: kibana:8.17.1
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      # - XPACK_SECURITY_ENABLED=true
+      # - ELASTICSEARCH_USERNAME=elastic
+      # - ELASTICSEARCH_PASSWORD="123456"
+    ports:
+      - "5601:5601" # Kibana UI
     depends_on:
-      - opensearch
+      - elasticsearch
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -34,4 +36,4 @@ services:
     ports:
       - "4317:4317" # OTLP gRPC receiver
 volumes:
-  opensearch_data:
+  es_data:
