@@ -11,16 +11,12 @@ processors:
 # Exporters
 exporters:
   debug:
-    verbosity: detailed
-
-  otlp/openobserve:
-      endpoint: openobserve:5081
-      headers:
-        Authorization: "Basic YWRtaW5AZXhhbXBsZS5jb206UWN5MU1iRmlrbUV6MUlpYg=="
-        organization: default
-        stream-name: default
-      tls:
-        insecure: true
+    verbosity: 
+ 
+  elasticsearch:
+    endpoint: http://opensearch:9200
+    tls:
+        insecure: true    
 
 # Pipelines
 service:
@@ -28,12 +24,12 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/openobserve]
-    traces: 
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp/openobserve] 
-    metrics:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp/openobserve]
+      exporters: [elasticsearch]
+    # traces: 
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [elasticsearch] 
+    # metrics:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [elasticsearch]

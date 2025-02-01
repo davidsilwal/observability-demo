@@ -1,24 +1,37 @@
 version: '3'
 services:
-  openobserve:
-    image: public.ecr.aws/zinclabs/openobserve:latest
-    container_name: openobserve
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch
     environment:
-      - ZO_ROOT_USER_EMAIL=admin@example.com       # Admin email
-      - ZO_ROOT_USER_PASSWORD=Admin@123     # Admin password
-      - ZO_DATA_DIR=/data                         # Data directory inside the container
-    ports:
-      - "5080:5080"                               # HTTP port for OpenObserve web UI/API
+      discovery.type: single-node
+      node.name: opensearch
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: S9\V1ZeBc0(S
     volumes:
-      - openobserve_data:/data                              # Bind mount for persistent data storage
-    restart: always
- 
+      - opensearch_data:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+    depends_on:
+      - opensearch
+
   otel-collector:
-    image: otel/opentelemetry-collector:latest
+    image: otel/opentelemetry-collector-contrib:latest
     command: [ "--config=/etc/otel.yaml" ]
     volumes:
       - ./.config/otel.yaml:/etc/otel.yaml
     ports:
       - "4317:4317" # OTLP gRPC receiver
 volumes:
-  openobserve_data:
+  opensearch_data:
