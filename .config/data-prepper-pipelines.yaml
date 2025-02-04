@@ -36,12 +36,20 @@ metrics-pipeline:
   source:
     otel_metrics_source:
       ssl: false
+  buffer:
+    bounded_blocking:
+       buffer_size: 1024 # max number of records the buffer accepts
+       batch_size: 1024 # max number of records the buffer drains after each read
   processor:
-    - otel_metrics_raw_processor:
+    - otel_metrics:
+       calculate_histogram_buckets: true
+       calculate_exponential_histogram_buckets: true
+       exponential_histogram_max_allowed_scale: 10
+       flatten_attributes: false
   sink:
     - opensearch:
         hosts: ["https://opensearch:9200"]
         username: "admin"
         password: 'S9\V1ZeBc0(S'
         insecure: true
-        index: metrics-otel-v1-%{yyyy.MM.dd}
+        index: ss4o_metrics-otel-%{yyyy.MM.dd}
