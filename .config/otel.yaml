@@ -15,6 +15,10 @@ exporters:
  
   elasticsearch:
     endpoints: [http://elasticsearch:9200]
+    username: "<username>" # Optional if security is disabled
+    password: "<password>" # Optional if security is disabled
+    index: "otel-%{type}-%{YYYY.MM.dd}" # Dynamic index naming based on telemetry type
+    logstash_format: true # Use Logstash-compatible format for logs
 
   # otlp:
   #       endpoint: "elasticsearch:8200"

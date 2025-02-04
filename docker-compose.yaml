@@ -6,9 +6,8 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      # - xpack.security.enabled=false # Disable security for simplicity
-      - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=123456
+      - xpack.security.enabled=false
+      # - ELASTIC_PASSWORD=123456
       - ES_JAVA_OPTS=-Xms512m -Xmx512m # Set Java heap size
     volumes:
       - es_data:/usr/share/elasticsearch/data
@@ -21,8 +20,8 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       # - XPACK_SECURITY_ENABLED=true
-      # - ELASTICSEARCH_USERNAME=elastic
-      # - ELASTICSEARCH_PASSWORD="123456"
+      # - ELASTICSEARCH_USERNAME=admin
+      # - ELASTICSEARCH_PASSWORD=123456
     ports:
       - "5601:5601" # Kibana UI
     depends_on:
