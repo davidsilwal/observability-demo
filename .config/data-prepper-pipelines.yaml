@@ -1,0 +1,47 @@
+version: 2
+
+logs-pipeline:
+  workers: 4
+  delay: "100"
+  source:
+    otel_logs_source:
+      ssl: false
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        username: "admin"
+        password: 'S9\V1ZeBc0(S'
+        insecure: true
+        index_type: custom
+        index: logs-otel-v1-%{yyyy.MM.dd}
+        bulk_size: 4
+
+traces-pipeline:
+  workers: 4
+  delay: "100"
+  source:
+    otel_trace_source:
+      ssl: false
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        username: "admin"
+        password: 'S9\V1ZeBc0(S'
+        insecure: true
+        index: traces-otel-v1-%{yyyy.MM.dd}
+
+metrics-pipeline:
+  workers: 4
+  delay: "100"
+  source:
+    otel_metrics_source:
+      ssl: false
+  processor:
+    - otel_metrics_raw_processor:
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch:9200"]
+        username: "admin"
+        password: 'S9\V1ZeBc0(S'
+        insecure: true
+        index: metrics-otel-v1-%{yyyy.MM.dd}

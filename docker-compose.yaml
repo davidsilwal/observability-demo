@@ -1,5 +1,18 @@
 version: '3'
 services:
+  data-prepper:
+    container_name: data-prepper
+    image: opensearchproject/data-prepper:latest
+    ports:
+      - "21980:21980"
+      - "21890:21890" #traces
+      - "21891:21891" #metrics
+      - "21892:21892" #logs
+      - "2021:2021" #http
+    volumes:
+     - ./.config/data-prepper-pipelines.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml
+     - ./.config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml
+
   opensearch:
     image: opensearchproject/opensearch:latest
     container_name: opensearch
@@ -33,5 +46,8 @@ services:
       - ./.config/otel.yaml:/etc/otel.yaml
     ports:
       - "4317:4317" # OTLP gRPC receiver
+    depends_on:
+      - data-prepper
+
 volumes:
   opensearch_data:

@@ -3,7 +3,7 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:4317       
+        endpoint: 0.0.0.0:4317
 # Processors
 processors:
   batch:
@@ -11,25 +11,32 @@ processors:
 # Exporters
 exporters:
   debug:
-    verbosity: 
- 
-  elasticsearch:
-    endpoints: [http://opensearch:9200]
+    verbosity:
+  otlp/data-prepper-traces:
+    endpoint: data-prepper:21890
+    tls:
+      insecure: true
+  otlp/data-prepper-logs:
+    endpoint: data-prepper:21892
+    tls:
+      insecure: true
+  otlp/data-prepper-metrics:
+    endpoint: data-prepper:21891
+    tls:
+      insecure: true
 
-  # otlp:
-  #       endpoint: "elasticsearch:8200"
 # Pipelines
 service:
   pipelines:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [elasticsearch]
-    traces: 
+      exporters: [otlp/data-prepper-logs]
+    traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [elasticsearch] 
+      exporters: [otlp/data-prepper-traces]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [elasticsearch]
+      exporters: [otlp/data-prepper-metrics]
