@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.HttpLogging;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -35,7 +36,14 @@ builder.Services.AddOpenTelemetry()
     {
         metrics.AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
-            .AddRuntimeInstrumentation();
+            .AddRuntimeInstrumentation()
+            .AddMeter("Microsoft.AspNetCore.Hosting")
+            .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+            .AddMeter("Microsoft.AspNetCore.Http.Connections")
+            .AddMeter("Microsoft.AspNetCore.Routing")
+            .AddMeter("Microsoft.AspNetCore.Diagnostics")
+            .AddMeter("Microsoft.AspNetCore.RateLimiting")
+            .AddMeter(appName);
     })
     .WithTracing(tracing =>
     {
@@ -57,6 +65,7 @@ if (useOtlpExporter)
     builder.Services.AddOpenTelemetry().UseOtlpExporter();
 }
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -74,11 +83,12 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
+
 app.MapGet("/weatherforecast", (ILogger<Program> logger) =>
     {
         using var _ = logger.BeginScope(new List<KeyValuePair<string, object>>
         {
-            new("DateTime", DateTime.Now.ToString())
+            new("DateTime", DateTime.Now.ToString(CultureInfo.InvariantCulture))
         });
 
         var forecast = Enumerable.Range(1, 5).Select(index =>
