@@ -1,39 +1,37 @@
-# Receivers
 receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:4317       
-# Processors
+        endpoint: "0.0.0.0:4317" # Bind to all interfaces on port 4317 for gRPC
+      http:
+        endpoint: "0.0.0.0:4318" # Optional: Bind to all interfaces on port 4318 for HTTP
+
 processors:
   batch:
+    timeout: 10s
+    send_batch_size: 100
 
-# Exporters
 exporters:
+  # Debug Exporter (replaces the deprecated logging exporter)
   debug:
-    verbosity: 
- 
-  elasticsearch:
-    endpoints: [http://elasticsearch:9200]
-    username: "<username>" # Optional if security is disabled
-    password: "<password>" # Optional if security is disabled
-    index: "otel-%{type}-%{YYYY.MM.dd}" # Dynamic index naming based on telemetry type
-    logstash_format: true # Use Logstash-compatible format for logs
+    verbosity: detailed # Options: basic, normal, detailed
 
-  # otlp:
-  #       endpoint: "elasticsearch:8200"
-# Pipelines
+  otlp/elastic:
+    endpoint: "http://apm-server:8200" # Replace with your APM Server URL
+    tls:
+      insecure: true # Set to false and configure certificates if using TLS
+
 service:
   pipelines:
-    logs:
+    traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [elasticsearch]
-    traces: 
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [elasticsearch] 
+      exporters: [debug, otlp/elastic]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [elasticsearch]
+      exporters: [debug, otlp/elastic]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp/elastic]
